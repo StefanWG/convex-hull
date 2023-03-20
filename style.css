@@ -1,1 +1,24 @@
-/* Add Your Styles Here! */
+#root {
+    margin: auto;
+    width: 600px;
+}
+
+#convex-hull-box {
+    background-color: lightgray;
+}
+
+#buttons {
+    display: flex;
+}
+
+button {
+    flex-grow: 1;
+    border: none;
+}
+
+.point {
+    r: 10;
+    fill: lightslategrey;
+    stroke: darkslategray;
+    stroke-width: 3px;
+}

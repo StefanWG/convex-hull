@@ -54,8 +54,8 @@ function PointSet () {
     // create a new Point with coordintes (x, y) and add it to this
     // PointSet
     this.addNewPoint = function (x, y) {
-	this.points.push(new Point(x, y, this.curPointID));
-	this.curPointID++;
+	    this.points.push(new Point(x, y, this.curPointID));
+	    this.curPointID++;
     }
 
     // add an existing point to this PointSet
@@ -65,58 +65,72 @@ function PointSet () {
 
     // sort the points in this.points 
     this.sort = function () {
-	this.points.sort((a,b) => {return a.compareTo(b)});
+	    this.points.sort((a,b) => {return a.compareTo(b)});
     }
 
     // reverse the order of the points in this.points
     this.reverse = function () {
-	this.points.reverse();
+	    this.points.reverse();
     }
 
     // return an array of the x-coordinates of points in this.points
     this.getXCoords = function () {
-	let coords = [];
-	for (let pt of this.points) {
-	    coords.push(pt.x);
-	}
+        let coords = [];
+        for (let pt of this.points) {
+            coords.push(pt.x);
+        }
 
-	return coords;
+        return coords;
     }
 
     // return an array of the y-coordinates of points in this.points
     this.getYCoords = function () {
-	let coords = [];
-	for (pt of this.points) {
-	    coords.push(pt.y);
-	}
+        let coords = [];
+        for (pt of this.points) {
+            coords.push(pt.y);
+        }
 
-	return coords;
+        return coords;
     }
 
     // get the number of points 
     this.size = function () {
-	return this.points.length;
+	    return this.points.length;
     }
 
     // return a string representation of this PointSet
     this.toString = function () {
-	let str = '[';
-	for (let pt of this.points) {
-	    str += pt + ', ';
-	}
-	str = str.slice(0,-2); 	// remove the trailing ', '
-	str += ']';
+        let str = '[';
+        for (let pt of this.points) {
+            str += pt + ', ';
+        }
+        str = str.slice(0,-2); 	// remove the trailing ', '
+        str += ']';
 
-	return str;
+        return str;
     }
 }
 
 
 function ConvexHullViewer (svg, ps) {
-    this.svg = svg;  // a n svg object where the visualization is drawn
+    this.svg = svg;  // an svg object where the visualization is drawn
     this.ps = ps;    // a point set of the points to be visualized
+    this.clickedPoint = null;
+    
+    this.addPoint = function(event) {
+        const svg = document.getElementById("convex-hull-box");
+        const rect = svg.getBoundingClientRect()
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        ps.addNewPoint(x, y);
 
-    // COMPLETE THIS OBJECT
+        const points = document.getElementById("vertices");
+        const p = document.createElementNS(SVG_NS, "circle");
+        p.classList.add("point");
+        p.setAttributeNS(null, "cx", x);
+        p.setAttributeNS(null, "cy", y);
+        points.appendChild(p);
+    }
 }
 
 /*
@@ -153,3 +167,11 @@ function ConvexHull (ps, viewer) {
 	
     }
 }
+
+const svg = document.getElementById("convex-hull-box");
+console.log("SVG", svg)
+const ps = new PointSet();
+const chv = new ConvexHullViewer(svg, ps);
+const ch = new ConvexHull(ps, chv);
+
+svg.addEventListener("click", chv.addPoint);
