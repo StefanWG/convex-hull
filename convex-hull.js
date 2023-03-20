@@ -117,32 +117,39 @@ function ConvexHullViewer (svg, ps) {
     this.ps = ps;    // a point set of the points to be visualized
     this.clickedPoint = null;
     this.hull = [];
-    console.log(this.ps, "CHV");
     
     this.addPoint = function(event) {
         const svg = document.getElementById("convex-hull-box");
         const rect = svg.getBoundingClientRect();
+        // compute x and y
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
+        // add to ps
         this.ps.addNewPoint(x, y);
-
+        // create element and add to svg
         const points = document.getElementById("vertices");
         const p = document.createElementNS(SVG_NS, "circle");
         p.classList.add("point");
         p.setAttributeNS(null, "cx", x);
         p.setAttributeNS(null, "cy", y);
         points.appendChild(p);
-        console.log(this.ps, "adding")
+
     }
 
+    // Draw hull
     this.drawHull = function(hull) {
+        console.log("drawing hull", hull);
+        //remove old edges
         const edgeLayer = document.getElementById("edges");
         while (edgeLayer.firstChild) {
             edgeLayer.removeChild(edgeLayer.firstChild);
         }
+        //avoid error if empty set or set of size 1
         if (hull.length < 2) return 0;
+        //add new edges
         for (let i = 1; i < hull.length; i++) {
             const line = document.createElementNS(SVG_NS, "line");
+            console.log(hull[i-1]);
             line.setAttributeNS(null, "x1", hull[i-1].x);
             line.setAttributeNS(null, "y1", hull[i-1].y);
             line.setAttributeNS(null, "x2", hull[i].x);
@@ -168,6 +175,7 @@ function ConvexHull (ps, viewer) {
         //Initialize necessry variables
         this.ps.sort();
         this.hull = [];
+        //add first two points to hull
         this.hull.push(this.ps.points[0]);
         this.hull.push(this.ps.points[1]);
         this.curElem = 2;
@@ -176,17 +184,18 @@ function ConvexHull (ps, viewer) {
     }
 
     // perform a single step of the Graham scan algorithm performed on ps
+    // returns true if algo is done
     this.step = function () {
-        if (this.hull.length < 2) {
+        if (this.hull.length < 2) { //if hull size < 2 add element
             this.hull.push(this.ps.points[this.curElem]);
             this.curElem++;
-        } else if (this.curElem == this.ps.points.length && this.leftToRight) {
+        } else if (this.curElem == this.ps.points.length && this.leftToRight) { //we have reached end going left to right
             this.leftToRight = false;
             this.ps.reverse();
             this.hull.push(this.ps.points[1]);
             this.curElem = 2;
-        } else if (this.curElem == this.ps.points.length) {
-            console.log("done");
+        } else if (this.curElem == this.ps.points.length) { //We have reached end going right to left
+            return true;
         } else {
             const a = this.hull[this.hull.length - 2];
             const b = this.hull[this.hull.length - 1];
@@ -195,13 +204,24 @@ function ConvexHull (ps, viewer) {
             if (this.isRightTurn(a,b,c)) { //All a, b, and c are part of hull
                 this.hull.push(c);
                 this.curElem++;
-            } else { //B is not part of convex hull
+            } else { //if left turn, B is not part of convex hull
                 this.hull.pop();
             }
         }
     
-        console.log(this.hull);
         viewer.drawHull(this.hull);
+        return false;
+    }
+
+    //animate algo
+    this.animate = function () {
+        this.start();
+        var stepResult = this.step();
+        //TODO: add animation
+        while (!stepResult) {
+            stepResult = this.step();
+        }
+        this.viewer.drawHull(this.hull);
     }
 
     // Return a new PointSet consisting of the points along the convex
@@ -212,32 +232,37 @@ function ConvexHull (ps, viewer) {
     // in clockwise order, starting from the left-most point, breaking
     // ties by minimum y-value.
     this.getConvexHull = function () {
-        ps.sort(); //sort coordinates
-        const hullUpper = []
-	// COMPLETE THIS METHOD
-	
+        //Run algo
+        this.start();
+        const stepResult = this.step();
+        while (!stepResult) {
+            stepResult = this.step();
+        }
+        //Create new ps and add all points
+        const convexHull = new PointSet();
+        for (const p of this.hull) {
+            convexHull.addPoint(p);
+        }
+        return convexHull;
     }
 
+
     this.isRightTurn = function(a,b, c) {
-        if (a.x == c.x) { //both vertical
-            return true;
-        } else if (a.x == b.x) { //a-b vertical - must be right turn because points are ordered
-            return true;
-        } else if (b.x == c.x) { //b-c vertical
-            return (c.y < b.y && b.x > a.x) || (c.y > b.y && b.x < a.x);
+        if (a.x == b.x) { //vertical line
+            if (a.y < b.y) return c.x >= b.x; //a is lower than b, right turn if c is to the right of b
+            if (a.y > b.y) return c.x <= b.x; //a is higher than b, right turn if c is to the left of b
+            return true; //all three in same vertical line
         }
-        
-        if (a.x < b.x) { //left to right
-            const slopeAB = (b.y - a.y) / (b.x - a.x);
-            const slopeBC = (c.y - b.y) / (c.x - b.x);
-            return slopeAB <= slopeBC;
-        } else if (a.x > b.x) { //right to left
-            const slopeBA = (a.y - b.y) / (a.x - b.x);
-            const slopeCB = (b.y - c.y) / (b.x - c.x);
-            return slopeBA <= slopeCB;
-        } else {
-            return true;
+        if (a.x < b.x) { // If c is above the line a->b then a-b-c is a right turn
+            const slope = (b.y - a.y) / (b.x-a.x);
+            const yInt = a.y - a.x * slope
+            return c.y > slope*c.x+yInt;
+        } else if (a.x > b.x) { // If c is below the in b-> then a-b-c is a right turn
+            const slope = (a.y - b.y) / (a.x-b.x);
+            const yInt = a.y - a.x * slope
+            return c.y < slope*c.x+yInt;
         }
+        //REMEMBER THIS IS SCREEN COORDINATES NOT STANDARD COORDINATES
     }
 }
 
@@ -245,16 +270,21 @@ const svg = document.getElementById("convex-hull-box");
 const ps = new PointSet();
 const chv = new ConvexHullViewer(svg, ps);
 const ch = new ConvexHull(ps, chv);
-
+//Add listener for clicking svg
 svg.addEventListener("click", (e) => {
     chv.addPoint(e);   
 });
-
+//Add listener for steps
 const stepButton = document.getElementById("step");
 step.addEventListener("click", (e) => {
-    ch.step(e);
+    ch.step();
 });
-
+//Add listener for animate
+const animateButton = document.getElementById("animate");
+animateButton.addEventListener("click", (e) => {
+    ch.animate();
+});
+//Add listener for start
 const startButton = document.getElementById("start");
 startButton.addEventListener("click", (e) => {
     ch.start();
