@@ -22,3 +22,8 @@ button {
     stroke: darkslategray;
     stroke-width: 3px;
 }
+
+.edge {
+    stroke-width: 3px;
+    stroke: gray;
+}
