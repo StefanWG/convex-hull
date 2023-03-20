@@ -279,6 +279,7 @@ const stepButton = document.getElementById("step");
 step.addEventListener("click", (e) => {
     ch.step();
 });
+//TODO: PREVENT CLICK OF STEP UNTIL START HAS BEEN CLICKED
 //Add listener for animate
 const animateButton = document.getElementById("animate");
 animateButton.addEventListener("click", (e) => {
@@ -289,4 +290,3 @@ const startButton = document.getElementById("start");
 startButton.addEventListener("click", (e) => {
     ch.start();
 });
-ch.start();
