@@ -140,7 +140,9 @@ function ConvexHullViewer (svg, ps) {
         p.classList.add("point");
         p.setAttributeNS(null, "cx", x);
         p.setAttributeNS(null, "cy", y);
+        p.id = ""+ ps.curPointID - 1+"";
         points.appendChild(p);
+        console.log(points);
 
     }
 
@@ -190,6 +192,29 @@ function ConvexHull (ps, viewer) {
         this.curElem = 2;
         this.leftToRight = true;
         this.viewer.drawHull(this.hull);
+
+        this.addToHull(this.hull[0].id);
+        this.highlight(this.hull[1].id);
+        this.addToHull(this.hull[1].id);
+        
+    }
+
+    //change the color on point to indicate it is part of hull
+    this.addToHull = function (id){
+        document.getElementById(id).classList.add("hullVertex");
+    }
+
+    this.removeFromHull = function (id){
+        document.getElementById(id).classList.remove("hullVertex");
+    }
+
+    //highlight given point red
+    this.highlight = function(id){
+        document.getElementById(id).classList.add("currentVertex");
+    }
+
+    this.unhighlight = function(id){
+        document.getElementById(id).classList.remove("currentVertex");
     }
 
     // perform a single step of the Graham scan algorithm performed on ps
@@ -209,12 +234,14 @@ function ConvexHull (ps, viewer) {
             const a = this.hull[this.hull.length - 2];
             const b = this.hull[this.hull.length - 1];
             const c = this.ps.points[this.curElem];
-    
+            this.unhighlight(b.id);
+            this.highlight(c.id);
             if (this.isRightTurn(a,b,c)) { //All a, b, and c are part of hull
                 this.hull.push(c);
+                this.addToHull(c.id);
                 this.curElem++;
             } else { //if left turn, B is not part of convex hull
-                this.hull.pop();
+                this.removeFromHull( this.hull.pop().id);
             }
         }
     

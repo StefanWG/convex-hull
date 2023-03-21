@@ -18,7 +18,7 @@ button{
     height: 400px;
     display: block;
     margin: 15px auto;
-    background-color: white;
+    background-color: lightbluegit ;
 
 }
 
@@ -39,4 +39,13 @@ button{
 .edge {
     stroke-width: 3px;
     stroke: gray;
+}
+
+.currentVertex{
+    stroke: red !important;
+
+}
+
+.hullVertex{
+    stroke: green;
 }
