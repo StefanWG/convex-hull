@@ -51,6 +51,14 @@ function PointSet () {
     this.points = [];
     this.curPointID = 0;
 
+    //remove all elements from set
+    this.reset = function(){
+        while(this.points[0]){
+            this.points.pop();
+        }
+        this.curPointID = 0;
+    }
+
     // create a new Point with coordintes (x, y) and add it to this
     // PointSet
     this.addNewPoint = function (x, y) {
@@ -170,6 +178,7 @@ function ConvexHull (ps, viewer) {
     this.curElem = null;
     this.leftToRight = null;
 
+
     // start a visualization of the Graham scan algorithm performed on ps
     this.start = function () {
         //Initialize necessry variables
@@ -249,8 +258,8 @@ function ConvexHull (ps, viewer) {
 
     this.isRightTurn = function(a,b, c) {
         if (a.x == b.x) { //vertical line
-            if (a.y < b.y) return c.x >= b.x; //a is lower than b, right turn if c is to the right of b
-            if (a.y > b.y) return c.x <= b.x; //a is higher than b, right turn if c is to the left of b
+            if (a.y < b.y) return c.x <= b.x; //a is lower than b, right turn if c is to the right of b
+            if (a.y > b.y) return c.x >= b.x; //a is higher than b, right turn if c is to the left of b
             return true; //all three in same vertical line
         }
         if (a.x < b.x) { // If c is above the line a->b then a-b-c is a right turn
@@ -289,4 +298,22 @@ animateButton.addEventListener("click", (e) => {
 const startButton = document.getElementById("start");
 startButton.addEventListener("click", (e) => {
     ch.start();
+});
+//Add listener for reset
+const resetButton = document.getElementById("reset");
+resetButton.addEventListener("click", () => {
+    //remove edges
+    const edgeLayer = document.getElementById("edges");
+        while (edgeLayer.lastChild) {
+            edgeLayer.removeChild(edgeLayer.lastChild);
+        }
+    //remove vertices
+    const vert = document.getElementById("vertices");
+        while (vert.lastChild) {
+            vert.removeChild(vert.lastChild);
+        }
+    //reset point set
+    ps.reset();
+    
+    
 });

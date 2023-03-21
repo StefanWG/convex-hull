@@ -1,14 +1,31 @@
+/* Add Your Styles Here! */
 #root {
     margin: auto;
     width: 600px;
 }
 
-#convex-hull-box {
-    background-color: lightgray;
+button{
+    margin: 0px 5px;
+  padding: 5px 10px;
+  border: 1px solid white;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-#buttons {
+#convex-hull-box{
+    border: 2px solid red;
+    width: 600px;
+    height: 400px;
+    display: block;
+    margin: 15px auto;
+    background-color: white;
+
+}
+
+#button-bar{
     display: flex;
+    justify-content: center;
+    margin-top: 10px;
 }
 
 button {

@@ -10,16 +10,20 @@
   </head>
   <body>
     <div id="root">
-      <h1>Title Your Page</h1>
-      <p>Make a description here</p>
+      <h1>Graham's Algorithm Visualization</h1>
+      <p>For this assignment, we have created an interactive visualization for Graham's scan algorithm for computing the convex hull of a set of points
+        in the plane. To start, add points to the set by clicking anywhere within the box below. Once you have finished, click the <b>start</b> button. Next,
+      you can either repeatedly press the <b>step</b> buton to illustrate each indivudal step of the algorithm, or you can press the <b>animate</b> button to show
+    each step of the algorithm at fixed time intervals. Enjoy!</p>
       <svg id="convex-hull-box" xmlns="http://www.w3.org/2000/svg" width="600" height="400">
         <g id="edges"></g>
         <g id="vertices"></g>
       </svg>
-      <div id="buttons">
+      <div id="button-bar">
         <button id="start">Start</button>
         <button id="step">Step</button>
         <button id="animate">Animate</button>
+        <button id="reset">Reset</button>
       </div>
     </div>
   </body>
