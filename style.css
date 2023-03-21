@@ -5,11 +5,11 @@
 }
 
 button{
-    margin: 0px 5px;
+  margin: 0px 5px;
   padding: 5px 10px;
-  border: 1px solid white;
   border-radius: 5px;
   cursor: pointer;
+  flex-grow: 1;
 }
 
 #convex-hull-box{
@@ -28,10 +28,6 @@ button{
     margin-top: 10px;
 }
 
-button {
-    flex-grow: 1;
-    border: none;
-}
 
 .point {
     r: 10;
