@@ -142,13 +142,10 @@ function ConvexHullViewer (svg, ps) {
         p.setAttributeNS(null, "cy", y);
         p.id = ""+ ps.curPointID - 1+"";
         points.appendChild(p);
-        console.log(points);
-
     }
 
     // Draw hull
     this.drawHull = function(hull) {
-        // console.log("drawing hull", hull);
         //remove old edges
         const edgeLayer = document.getElementById("edges");
         while (edgeLayer.firstChild) {
@@ -159,7 +156,6 @@ function ConvexHullViewer (svg, ps) {
         //add new edges
         for (let i = 1; i < hull.length; i++) {
             const line = document.createElementNS(SVG_NS, "line");
-            // console.log(hull[i-1]);
             line.setAttributeNS(null, "x1", hull[i-1].x);
             line.setAttributeNS(null, "y1", hull[i-1].y);
             line.setAttributeNS(null, "x2", hull[i].x);
@@ -232,7 +228,6 @@ function ConvexHull (ps, viewer) {
     // perform a single step of the Graham scan algorithm performed on ps
     // returns true if algo is done
     this.step = function () {
-        console.log("stepping", this.hull);
         if (this.hull.length < 2) { //if hull size < 2 add element
             this.hull.push(this.ps.points[this.curElem]);
             this.viewer.addToHull(this.ps.points[this.curElem].id);
