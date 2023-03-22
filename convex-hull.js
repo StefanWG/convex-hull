@@ -148,7 +148,7 @@ function ConvexHullViewer (svg, ps) {
 
     // Draw hull
     this.drawHull = function(hull) {
-        console.log("drawing hull", hull);
+        // console.log("drawing hull", hull);
         //remove old edges
         const edgeLayer = document.getElementById("edges");
         while (edgeLayer.firstChild) {
@@ -159,7 +159,7 @@ function ConvexHullViewer (svg, ps) {
         //add new edges
         for (let i = 1; i < hull.length; i++) {
             const line = document.createElementNS(SVG_NS, "line");
-            console.log(hull[i-1]);
+            // console.log(hull[i-1]);
             line.setAttributeNS(null, "x1", hull[i-1].x);
             line.setAttributeNS(null, "y1", hull[i-1].y);
             line.setAttributeNS(null, "x2", hull[i].x);
@@ -167,36 +167,6 @@ function ConvexHullViewer (svg, ps) {
             line.classList.add("edge");
             edgeLayer.appendChild(line);
         }
-    }
-}
-
-/*
- * An object representing an instance of the convex hull problem. A ConvexHull stores a PointSet ps that stores the input points, and a ConvexHullViewer viewer that displays interactions between the ConvexHull computation and the 
- */
-function ConvexHull (ps, viewer) {
-    this.ps = ps;          // a PointSet storing the input to the algorithm
-    this.viewer = viewer;  // a ConvexHullViewer for this visualization
-    this.hull = 3;
-    this.curElem = null;
-    this.leftToRight = null;
-
-
-    // start a visualization of the Graham scan algorithm performed on ps
-    this.start = function () {
-        //Initialize necessry variables
-        this.ps.sort();
-        this.hull = [];
-        //add first two points to hull
-        this.hull.push(this.ps.points[0]);
-        this.hull.push(this.ps.points[1]);
-        this.curElem = 2;
-        this.leftToRight = true;
-        this.viewer.drawHull(this.hull);
-
-        this.addToHull(this.hull[0].id);
-        this.highlight(this.hull[1].id);
-        this.addToHull(this.hull[1].id);
-        
     }
 
     //change the color on point to indicate it is part of hull
@@ -216,39 +186,89 @@ function ConvexHull (ps, viewer) {
     this.unhighlight = function(id){
         document.getElementById(id).classList.remove("currentVertex");
     }
+}
+
+
+/*
+ * An object representing an instance of the convex hull problem. A ConvexHull stores a PointSet ps that stores the input points, and a ConvexHullViewer viewer that displays interactions between the ConvexHull computation and the 
+ */
+function ConvexHull (ps, viewer) {
+    this.ps = ps;          // a PointSet storing the input to the algorithm
+    this.viewer = viewer;  // a ConvexHullViewer for this visualization
+    this.hull = [];
+    this.upperHull = [];
+    this.curElem = null;
+    this.leftToRight = null;
+    this.animating = false;
+    this.intervalID = null;
+
+
+    // start a visualization of the Graham scan algorithm performed on ps
+    this.start = function () {
+        //Initialize necessry variables
+        this.ps.sort();
+        //remove all old points from hull
+        for (const p of this.ps.points) {
+            this.viewer.removeFromHull(p.id);
+            this.viewer.unhighlight(p.id);
+        }
+
+        this.hull = [];
+        this.upperHull = [];
+        //add first two points to hull
+        this.hull.push(this.ps.points[0]);
+        this.hull.push(this.ps.points[1]);
+        this.curElem = 2;
+        this.leftToRight = true;
+        this.viewer.drawHull(this.hull);   
+        this.animating = false;     
+
+        this.viewer.addToHull(this.hull[0].id);
+        this.viewer.highlight(this.hull[1].id);
+        this.viewer.addToHull(this.hull[1].id);
+        
+    }
 
     // perform a single step of the Graham scan algorithm performed on ps
     // returns true if algo is done
     this.step = function () {
+        console.log("stepping", this.hull);
         if (this.hull.length < 2) { //if hull size < 2 add element
             this.hull.push(this.ps.points[this.curElem]);
-            this.addToHull(this.ps.points[this.curElem].id);
+            this.viewer.addToHull(this.ps.points[this.curElem].id);
             this.curElem++;
         } else if (this.curElem == this.ps.points.length && this.leftToRight) { //we have reached end going left to right
             this.leftToRight = false;
             this.ps.reverse();
             this.hull.push(this.ps.points[1]);
-            this.highlight(this.ps.points[1].id);
-            this.unhighlight(this.ps.points[0].id);
-            this.addToHull(this.ps.points[1].id);
+            this.viewer.addToHull(this.ps.points[1].id);
+            this.viewer.highlight(this.ps.points[1].id);
+            this.viewer.unhighlight(this.ps.points[0].id);
+
+            for (const p of this.hull) {
+                this.upperHull.push(p);
+            }
+
             this.curElem = 2;
         } else if (this.curElem == this.ps.points.length) { //We have reached end going right to left
-            
+            if (this.animating) {
+                clearInterval(this.intervalID);
+            }
             return true;
         } else {
             const a = this.hull[this.hull.length - 2];
             const b = this.hull[this.hull.length - 1];
             const c = this.ps.points[this.curElem];
-            this.unhighlight(b.id);
-            this.highlight(c.id);
+            this.viewer.unhighlight(b.id);
+            this.viewer.highlight(c.id);
             if (this.isRightTurn(a,b,c)) { //All a, b, and c are part of hull
                 this.hull.push(c);
-                this.addToHull(c.id);
+                this.viewer.addToHull(c.id);
                 this.curElem++;
-            } else if(!this.leftToRight && (this.hull.includes(c))) { //if left turn, B is not part of convex hull
+            } else if (!this.leftToRight && (this.upperHull.includes(b))) { //if left turn, B is not part of convex hull
                 this.hull.pop();
             }else{
-                this.removeFromHull( this.hull.pop().id);
+                this.viewer.removeFromHull(this.hull.pop().id);
             }
         }
     
@@ -258,12 +278,10 @@ function ConvexHull (ps, viewer) {
 
     //animate algo
     this.animate = function () {
+        intervalID = null;
         this.start();
-        var stepResult = this.step();
-        //TODO: add animation
-        while (!stepResult) {
-            stepResult = this.step();
-        }
+        this.animating = true;
+        this.intervalID = setInterval(() => {this.step()}, 300);
 
         this.viewer.drawHull(this.hull);
     }
