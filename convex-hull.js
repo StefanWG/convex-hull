@@ -201,6 +201,7 @@ function ConvexHull (ps, viewer) {
 
     // start a visualization of the Graham scan algorithm performed on ps
     this.start = function () {
+        if (ps.points.length == 0) return 0;
         //Initialize necessry variables
         this.ps.sort();
         //remove all old points from hull
@@ -222,6 +223,9 @@ function ConvexHull (ps, viewer) {
         this.viewer.addToHull(this.hull[0].id);
         this.viewer.highlight(this.hull[1].id);
         this.viewer.addToHull(this.hull[1].id);
+
+        const stepButton = document.getElementById("step");
+        stepButton.removeAttribute("disabled");
         
     }
 
@@ -276,6 +280,8 @@ function ConvexHull (ps, viewer) {
         intervalID = null;
         this.start();
         this.animating = true;
+        const stepButton = document.getElementById("step");
+        stepButton.setAttribute("disabled", "true");
         this.intervalID = setInterval(() => {this.step()}, 300);
 
         this.viewer.drawHull(this.hull);
@@ -333,6 +339,7 @@ svg.addEventListener("click", (e) => {
 });
 //Add listener for steps
 const stepButton = document.getElementById("step");
+stepButton.setAttribute("disabled", "true");
 step.addEventListener("click", (e) => {
     ch.step();
 });
@@ -351,6 +358,11 @@ startButton.addEventListener("click", (e) => {
 //Add listener for reset
 const resetButton = document.getElementById("reset");
 resetButton.addEventListener("click", () => {
+    if (ps.points.length == 0) return 0;
+    //Stop animating
+    if (ch.animating) {
+        clearInterval(ch.intervalID);
+    }
     //remove edges
     const edgeLayer = document.getElementById("edges");
         while (edgeLayer.lastChild) {
@@ -363,6 +375,5 @@ resetButton.addEventListener("click", () => {
         }
     //reset point set
     ps.reset();
-    
-    
+    stepButton.setAttribute("disabled", "true");
 });
