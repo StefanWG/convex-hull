@@ -18,7 +18,7 @@ button{
     height: 400px;
     display: block;
     margin: 15px auto;
-    background-color: lightbluegit ;
+    background-color: lightblue ;
 
 }
 
@@ -48,4 +48,5 @@ button{
 
 .hullVertex{
     stroke: green;
+    fill: black;
 }

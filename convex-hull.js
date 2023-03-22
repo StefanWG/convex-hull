@@ -222,13 +222,18 @@ function ConvexHull (ps, viewer) {
     this.step = function () {
         if (this.hull.length < 2) { //if hull size < 2 add element
             this.hull.push(this.ps.points[this.curElem]);
+            this.addToHull(this.ps.points[this.curElem].id);
             this.curElem++;
         } else if (this.curElem == this.ps.points.length && this.leftToRight) { //we have reached end going left to right
             this.leftToRight = false;
             this.ps.reverse();
             this.hull.push(this.ps.points[1]);
+            this.highlight(this.ps.points[1].id);
+            this.unhighlight(this.ps.points[0].id);
+            this.addToHull(this.ps.points[1].id);
             this.curElem = 2;
         } else if (this.curElem == this.ps.points.length) { //We have reached end going right to left
+            
             return true;
         } else {
             const a = this.hull[this.hull.length - 2];
@@ -240,7 +245,9 @@ function ConvexHull (ps, viewer) {
                 this.hull.push(c);
                 this.addToHull(c.id);
                 this.curElem++;
-            } else { //if left turn, B is not part of convex hull
+            } else if(!this.leftToRight && (this.hull.includes(c))) { //if left turn, B is not part of convex hull
+                this.hull.pop();
+            }else{
                 this.removeFromHull( this.hull.pop().id);
             }
         }
@@ -257,6 +264,7 @@ function ConvexHull (ps, viewer) {
         while (!stepResult) {
             stepResult = this.step();
         }
+
         this.viewer.drawHull(this.hull);
     }
 
@@ -326,6 +334,7 @@ const startButton = document.getElementById("start");
 startButton.addEventListener("click", (e) => {
     ch.start();
 });
+
 //Add listener for reset
 const resetButton = document.getElementById("reset");
 resetButton.addEventListener("click", () => {
