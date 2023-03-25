@@ -2,18 +2,39 @@
 #root {
     margin: auto;
     width: 600px;
+    background-color: rgb(165, 206, 207);
+    padding-bottom: 50px;
+    padding-top: 10px;
 }
+body {
+    background-color: #F5F5F5;
+    margin: 0;
+    padding: 0;
+  }
 
+  h1 {
+    text-align: center;
+    margin-top: 30px;
+  }
 button{
   margin: 0px 5px;
   padding: 5px 10px;
   border-radius: 5px;
+  background-color: #1992c2;
   cursor: pointer;
   flex-grow: 1;
 }
 
+button:hover {
+    background-color: #ad2a2a;
+}
+button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+
 #convex-hull-box{
-    border: 2px solid red;
+    border: 1px solid black;
     width: 600px;
     height: 400px;
     display: block;

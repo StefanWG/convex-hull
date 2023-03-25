@@ -254,7 +254,7 @@ function ConvexHull (ps, viewer) {
                 clearInterval(this.intervalID);
             }
             return true;
-        } else {
+        } else { //check for left turn
             const a = this.hull[this.hull.length - 2];
             const b = this.hull[this.hull.length - 1];
             const c = this.ps.points[this.curElem];
@@ -264,10 +264,10 @@ function ConvexHull (ps, viewer) {
                 this.hull.push(c);
                 this.viewer.addToHull(c.id);
                 this.curElem++;
-            } else if (!this.leftToRight && (this.upperHull.includes(b))) { //if left turn, B is not part of convex hull
+            } else if (!this.leftToRight && (this.upperHull.includes(b))) { //if 'left turn' going from right to left
                 this.hull.pop();
             }else{
-                this.viewer.removeFromHull(this.hull.pop().id);
+                this.viewer.removeFromHull(this.hull.pop().id); //if left turn, b is not part of hull
             }
         }
     
@@ -328,52 +328,60 @@ function ConvexHull (ps, viewer) {
         //REMEMBER THIS IS SCREEN COORDINATES NOT STANDARD COORDINATES
     }
 }
-
-const svg = document.getElementById("convex-hull-box");
-const ps = new PointSet();
-const chv = new ConvexHullViewer(svg, ps);
-const ch = new ConvexHull(ps, chv);
-//Add listener for clicking svg
-svg.addEventListener("click", (e) => {
-    chv.addPoint(e);   
-});
-//Add listener for steps
-const stepButton = document.getElementById("step");
-stepButton.setAttribute("disabled", "true");
-step.addEventListener("click", (e) => {
-    ch.step();
-});
-//TODO: PREVENT CLICK OF STEP UNTIL START HAS BEEN CLICKED
-//Add listener for animate
-const animateButton = document.getElementById("animate");
-animateButton.addEventListener("click", (e) => {
-    ch.animate();
-});
-//Add listener for start
-const startButton = document.getElementById("start");
-startButton.addEventListener("click", (e) => {
-    ch.start();
-});
-
-//Add listener for reset
-const resetButton = document.getElementById("reset");
-resetButton.addEventListener("click", () => {
-    if (ps.points.length == 0) return 0;
-    //Stop animating
-    if (ch.animating) {
-        clearInterval(ch.intervalID);
-    }
-    //remove edges
-    const edgeLayer = document.getElementById("edges");
-        while (edgeLayer.lastChild) {
-            edgeLayer.removeChild(edgeLayer.lastChild);
-        }
-    //remove vertices
-    const vert = document.getElementById("vertices");
-        while (vert.lastChild) {
-            vert.removeChild(vert.lastChild);
-        }
-    //reset point set
-    ps.reset();
+function run(){
+    const svg = document.getElementById("convex-hull-box");
+    const ps = new PointSet();
+    const chv = new ConvexHullViewer(svg, ps);
+    const ch = new ConvexHull(ps, chv);
+    //Add listener for clicking svg
+    svg.addEventListener("click", (e) => {
+        chv.addPoint(e);   
+    });
+    //Add listener for steps
+    const stepButton = document.getElementById("step");
     stepButton.setAttribute("disabled", "true");
-});
+    step.addEventListener("click", (e) => {
+        ch.step();
+    });
+    //TODO: PREVENT CLICK OF STEP UNTIL START HAS BEEN CLICKED
+    //Add listener for animate
+    const animateButton = document.getElementById("animate");
+    animateButton.addEventListener("click", (e) => {
+        ch.animate();
+    });
+    //Add listener for start
+    const startButton = document.getElementById("start");
+    startButton.addEventListener("click", (e) => {
+        ch.start();
+    });
+
+    //Add listener for reset
+    const resetButton = document.getElementById("reset");
+    resetButton.addEventListener("click", () => {
+        if (ps.points.length == 0) return 0;
+        //Stop animating
+        if (ch.animating) {
+            clearInterval(ch.intervalID);
+        }
+        //remove edges
+        const edgeLayer = document.getElementById("edges");
+            while (edgeLayer.lastChild) {
+                edgeLayer.removeChild(edgeLayer.lastChild);
+            }
+        //remove vertices
+        const vert = document.getElementById("vertices");
+            while (vert.lastChild) {
+                vert.removeChild(vert.lastChild);
+            }
+        //reset point set
+        ps.reset();
+        stepButton.setAttribute("disabled", "true");
+    });
+}
+
+try {
+    exports.PointSet = PointSet;
+    exports.ConvexHull = ConvexHull;
+  } catch (e) {
+    console.log("not running in Node");
+  }

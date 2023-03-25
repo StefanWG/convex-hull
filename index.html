@@ -5,6 +5,12 @@
     <title>Graham's Algorithm</title>
     <link rel="stylesheet" href="style.css" type="text/css"/>
     <script src="convex-hull.js" defer></script>
+    <script>
+      window.onload = () => {
+          run();
+
+      }
+  </script>
     <!-- uncomment this line to test your program: -->
     <!-- <script src="ch-tester.js" defer></script> -->
   </head>
@@ -14,7 +20,8 @@
       <p>For this assignment, we have created an interactive visualization for Graham's scan algorithm for computing the convex hull of a set of points
         in the plane. To start, add points to the set by clicking anywhere within the box below. Once you have finished, click the <b>start</b> button. Next,
       you can either repeatedly press the <b>step</b> buton to illustrate each indivudal step of the algorithm, or you can press the <b>animate</b> button to show
-    each step of the algorithm at fixed time intervals. Enjoy!</p>
+    each step of the algorithm at fixed time intervals. At each step, the current node that the algorithm is evaluating is outlined in red. Nodes that are
+    apart of the convex hull will be outlined in green and filled in black. Enjoy!</p>
       <svg id="convex-hull-box" xmlns="http://www.w3.org/2000/svg" width="600" height="400">
         <g id="edges"></g>
         <g id="vertices"></g>
