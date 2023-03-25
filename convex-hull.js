@@ -205,10 +205,10 @@ function ConvexHull (ps, viewer) {
         //Initialize necessry variables
         this.ps.sort();
         //remove all old points from hull
-        for (const p of this.ps.points) {
-            this.viewer.removeFromHull(p.id);
-            this.viewer.unhighlight(p.id);
-        }
+        // for (const p of this.ps.points) {
+        //     this.viewer.removeFromHull(p.id);
+        //     this.viewer.unhighlight(p.id);
+        // }
 
         this.hull = [];
         this.upperHull = [];
@@ -217,15 +217,15 @@ function ConvexHull (ps, viewer) {
         this.hull.push(this.ps.points[1]);
         this.curElem = 2;
         this.leftToRight = true;
-        this.viewer.drawHull(this.hull);   
+        // this.viewer.drawHull(this.hull);   
         this.animating = false;     
 
-        this.viewer.addToHull(this.hull[0].id);
-        this.viewer.highlight(this.hull[1].id);
-        this.viewer.addToHull(this.hull[1].id);
+        // this.viewer.addToHull(this.hull[0].id);
+        // this.viewer.highlight(this.hull[1].id);
+        // this.viewer.addToHull(this.hull[1].id);
 
-        const stepButton = document.getElementById("step");
-        stepButton.removeAttribute("disabled");
+        // const stepButton = document.getElementById("step");
+        // stepButton.removeAttribute("disabled");
         
     }
 
@@ -234,15 +234,15 @@ function ConvexHull (ps, viewer) {
     this.step = function () {
         if (this.hull.length < 2) { //if hull size < 2 add element
             this.hull.push(this.ps.points[this.curElem]);
-            this.viewer.addToHull(this.ps.points[this.curElem].id);
+            // this.viewer.addToHull(this.ps.points[this.curElem].id);
             this.curElem++;
         } else if (this.curElem == this.ps.points.length && this.leftToRight) { //we have reached end going left to right
             this.leftToRight = false;
             this.ps.reverse();
             this.hull.push(this.ps.points[1]);
-            this.viewer.addToHull(this.ps.points[1].id);
-            this.viewer.highlight(this.ps.points[1].id);
-            this.viewer.unhighlight(this.ps.points[0].id);
+            // this.viewer.addToHull(this.ps.points[1].id);
+            // this.viewer.highlight(this.ps.points[1].id);
+            // this.viewer.unhighlight(this.ps.points[0].id);
 
             for (const p of this.hull) {
                 this.upperHull.push(p);
@@ -258,20 +258,21 @@ function ConvexHull (ps, viewer) {
             const a = this.hull[this.hull.length - 2];
             const b = this.hull[this.hull.length - 1];
             const c = this.ps.points[this.curElem];
-            this.viewer.unhighlight(b.id);
-            this.viewer.highlight(c.id);
+            // this.viewer.unhighlight(b.id);
+            // this.viewer.highlight(c.id);
             if (this.isRightTurn(a,b,c)) { //All a, b, and c are part of hull
                 this.hull.push(c);
-                this.viewer.addToHull(c.id);
+                // this.viewer.addToHull(c.id);
                 this.curElem++;
             } else if (!this.leftToRight && (this.upperHull.includes(b))) { //if 'left turn' going from right to left
                 this.hull.pop();
             }else{
-                this.viewer.removeFromHull(this.hull.pop().id); //if left turn, b is not part of hull
+                // this.viewer.removeFromHull(this.hull.pop().id); //if left turn, b is not part of hull
+                this.hull.pop().id; //for tester purposes
             }
         }
     
-        viewer.drawHull(this.hull);
+        // viewer.drawHull(this.hull);
         return false;
     }
 
@@ -284,7 +285,7 @@ function ConvexHull (ps, viewer) {
         stepButton.setAttribute("disabled", "true");
         this.intervalID = setInterval(() => {this.step()}, 300);
 
-        this.viewer.drawHull(this.hull);
+        // this.viewer.drawHull(this.hull);
     }
 
     // Return a new PointSet consisting of the points along the convex
@@ -296,8 +297,11 @@ function ConvexHull (ps, viewer) {
     // ties by minimum y-value.
     this.getConvexHull = function () {
         //Run algo
+        if (this.ps.size() == 1){
+            return this.ps;
+        }
         this.start();
-        const stepResult = this.step();
+        let stepResult = this.step();
         while (!stepResult) {
             stepResult = this.step();
         }
