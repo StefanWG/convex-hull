@@ -40,6 +40,7 @@ button:disabled {
     display: block;
     margin: 15px auto;
     background-color: lightblue ;
+    transform: matrix(1, 0, 0, -1, 0, 0);
 }
 
 #button-bar{

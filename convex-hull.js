@@ -131,7 +131,7 @@ function ConvexHullViewer (svg, ps) {
         const rect = svg.getBoundingClientRect();
         // compute x and y
         const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
+        const y = 400 - (event.clientY - rect.top);
         // add to ps
         this.ps.addNewPoint(x, y);
         // create element and add to svg
@@ -260,7 +260,7 @@ function ConvexHull (ps, viewer) {
             const c = this.ps.points[this.curElem];
             this.viewer.unhighlight(b.id);
             this.viewer.highlight(c.id);
-            if (this.isRightTurn(a,b,c)) { //All a, b, and c are part of hull
+            if (this.isRightTurnTester(a,b,c)) { //All a, b, and c are part of hull
                 this.hull.push(c);
                 this.viewer.addToHull(c.id);
                 this.curElem++;
@@ -329,7 +329,7 @@ function ConvexHull (ps, viewer) {
                 const a = this.hull[this.hull.length - 2];
                 const b = this.hull[this.hull.length - 1];
                 const c = this.ps.points[this.curElem];
-                if (this.isRightTurnTester(a,b,c)) { //All a, b, and c are part of hull
+                if (this.isRightTurn(a,b,c)) { //All a, b, and c are part of hull
                     this.hull.push(c);
                     this.curElem++;
                 }else {
@@ -345,26 +345,8 @@ function ConvexHull (ps, viewer) {
         return convexHull;
     }
 
-    this.isRightTurn = function(a,b, c) {
-        if (a.x == c.x && a.y == c.y) return true;
-        if (a.x == b.x) { //vertical line
-            if (a.y < b.y) return c.x < b.x; //a is lower than b, right turn if c is to the right of b
-            if (a.y > b.y) return c.x > b.x; //a is higher than b, right turn if c is to the left of b
-            return true; //all three in same vertical line
-        }
-        if (a.x < b.x) { // If c is above the line a->b then a-b-c is a right turn
-            const slope = (b.y - a.y) / (b.x-a.x);
-            const yInt = a.y - a.x * slope
-            return c.y > slope*c.x+yInt;
-        } else if (a.x > b.x) { // If c is below the in b-> then a-b-c is a right turn
-            const slope = (a.y - b.y) / (a.x-b.x);
-            const yInt = a.y - a.x * slope
-            return c.y < slope*c.x+yInt;
-        }
-        //REMEMBER THIS IS SCREEN COORDINATES NOT STANDARD COORDINATES
-    }
 
-    this.isRightTurnTester = function(a,b, c) {
+    this.isRightTurn = function(a,b, c) {
         if (a.x == c.x && a.y == c.y) return true;
         if (a.x == b.x) { //vertical line
             if (a.y < b.y) return c.x > b.x; //a is lower than b, right turn if c is to the right of b
@@ -380,7 +362,6 @@ function ConvexHull (ps, viewer) {
             const yInt = a.y - a.x * slope
             return c.y > slope*c.x+yInt;
         }
-        //REMEMBER THIS IS SCREEN COORDINATES NOT STANDARD COORDINATES
     }
 }
 function run(){
