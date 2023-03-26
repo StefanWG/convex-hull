@@ -260,7 +260,7 @@ function ConvexHull (ps, viewer) {
             const c = this.ps.points[this.curElem];
             this.viewer.unhighlight(b.id);
             this.viewer.highlight(c.id);
-            if (this.isRightTurnTester(a,b,c)) { //All a, b, and c are part of hull
+            if (this.isRightTurn(a,b,c)) { //All a, b, and c are part of hull
                 this.hull.push(c);
                 this.viewer.addToHull(c.id);
                 this.curElem++;
