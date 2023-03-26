@@ -41,6 +41,7 @@ button:disabled {
     margin: 15px auto;
     background-color: lightblue ;
     transform: matrix(1, 0, 0, -1, 0, 0);
+    box-sizing: border-box;
 }
 
 #button-bar{
