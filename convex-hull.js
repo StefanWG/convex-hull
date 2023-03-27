@@ -140,6 +140,7 @@ function ConvexHullViewer (svg, ps) {
         p.classList.add("point");
         p.setAttributeNS(null, "cx", x);
         p.setAttributeNS(null, "cy", y);
+        p.setAttributeNS(null, "r", 10);
         p.id = ""+ ps.curPointID - 1+"";
         points.appendChild(p);
     }

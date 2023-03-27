@@ -52,7 +52,6 @@ button:disabled {
 
 
 .point {
-    r: 10;
     fill: lightslategrey;
     stroke: darkslategray;
     stroke-width: 3px;
