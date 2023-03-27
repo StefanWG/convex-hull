@@ -204,6 +204,7 @@ function ConvexHull (ps, viewer) {
         if (ps.points.length == 0) return 0;
         //Initialize necessry variables
         this.ps.sort();
+
         //remove all old points from hull
         for (const p of this.ps.points) {
             this.viewer.removeFromHull(p.id);
@@ -214,6 +215,10 @@ function ConvexHull (ps, viewer) {
         this.upperHull = [];
         //add first two points to hull
         this.hull.push(this.ps.points[0]);
+        //edge case if only one vertex
+        if (ps.points.length == 1){
+            this.viewer.addToHull(this.hull[0].id);
+        } 
         this.hull.push(this.ps.points[1]);
         this.curElem = 2;
         this.leftToRight = true;
@@ -253,6 +258,7 @@ function ConvexHull (ps, viewer) {
             if (this.animating) {
                 clearInterval(this.intervalID);
             }
+            this.viewer.unhighlight(this.hull[0].id);
             return true;
         } else { //check for left turn
             const a = this.hull[this.hull.length - 2];
